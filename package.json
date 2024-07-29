@@ -34,10 +34,10 @@
   "repository": "https://github.com/Jhonatanmizu/snutsjs.git",
   "devDependencies": {
     "@eslint/js": "^9.8.0",
-    "@vitest/coverage-v8": "^1.6.0",
+    "@vitest/coverage-v8": "^2.0.4",
     "eslint": "9.x",
     "git-commit-msg-linter": "^5.0.8",
     "globals": "^15.3.0",
-    "vitest": "^1.6.0"
+    "vitest": "^2.0.4"
   }
 }
