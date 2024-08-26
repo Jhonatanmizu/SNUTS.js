@@ -15,7 +15,7 @@
   },
   "type": "module",
   "dependencies": {
-    "@babel/parser": "^7.24.5",
+    "@babel/parser": "^7.25.4",
     "@babel/traverse": "^7.24.5",
     "@babel/types": "^7.25.0",
     "@fastify/cors": "^9.0.1",
