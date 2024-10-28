@@ -17,7 +17,7 @@
   "dependencies": {
     "@babel/parser": "^7.24.5",
     "@babel/traverse": "^7.25.6",
-    "@babel/types": "^7.25.0",
+    "@babel/types": "^7.26.0",
     "@fastify/cors": "^10.0.1",
     "@fastify/helmet": "^12.0.1",
     "@fastify/swagger": "^9.2.0",
