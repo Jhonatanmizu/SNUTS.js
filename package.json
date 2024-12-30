@@ -24,7 +24,7 @@
     "@fastify/swagger-ui": "^5.1.0",
     "@json2csv/plainjs": "^7.0.6",
     "cors": "^2.8.5",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.4.7",
     "fastify": "^5.0.0",
     "glob": "^11.0.0",
     "pino-pretty": "^13.0.0",
