@@ -79,8 +79,8 @@ flowchart LR
 ### Installation
 
 ```sh
-git clone https://github.com/Jhonatanmizu/SNUTS.js.git
-cd SNUTS.js
+git clone https://github.com/Jhonatanmizu/snutsjs.git
+cd snutsjs
 yarn
 ```
 
