@@ -1,6 +1,7 @@
 import traverse from "@babel/traverse";
 import * as t from "@babel/types";
-const traverseDefault = traverse.default;
+const traverseDefault =
+  typeof traverse === "function" ? traverse : traverse.default;
 
 const jestMatchers = new Set([
   "toEqual",
