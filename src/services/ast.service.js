@@ -37,9 +37,23 @@ class AstService {
     typeof traverse === "function" ? traverse : traverse.default;
 
   getTestInfo(ast) {
+    let itCount = 0;
+    let describeCount = 0;
+
+    this.traverseDefault(ast, {
+      CallExpression: ({ node }) => {
+        if (node.callee.name === "describe") {
+          describeCount++;
+        }
+        if (this.isTestCase(node) && /it|test/g.test(node.callee.name)) {
+          itCount++;
+        }
+      },
+    });
+
     return {
-      itCount: this.getItCount(ast),
-      describeCount: this.getDescribeCount(ast),
+      itCount,
+      describeCount,
     };
   }
 
@@ -97,8 +111,8 @@ class AstService {
     }
   }
   parseFileToAst(file) {
-    const code = fs.readFileSync(file, "utf8");
-    return this.parseCodeToAst(code);
+    const code = fs.promises.readFile(file, "utf8");
+    return code.then((content) => this.parseCodeToAst(content));
   }
 
   isSetupMethod(node) {

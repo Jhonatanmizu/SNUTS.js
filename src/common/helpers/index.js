@@ -60,10 +60,13 @@ class Helpers {
 
   downloadRepository(repoUrl, directory) {
     return new Promise((resolve, reject) => {
-      exec(`git clone ${repoUrl} ${directory}`, (err, stdout) => {
-        if (err) return reject(err);
-        resolve(stdout);
-      });
+      exec(
+        `git clone --depth=1 --single-branch ${repoUrl} ${directory}`,
+        (err, stdout) => {
+          if (err) return reject(err);
+          resolve(stdout);
+        }
+      );
     });
   }
 
@@ -79,7 +82,8 @@ class Helpers {
       TEST_FILE_PATTERNS.map((pattern) => glob(pattern, options))
     );
 
-    return testFiles.flat();
+    const uniqueFiles = new Set(testFiles.flat());
+    return Array.from(uniqueFiles).sort();
   }
 
   parseFile(file) {
