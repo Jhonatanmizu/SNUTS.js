@@ -11,7 +11,7 @@ const analyzeRoutes = async (fastify = Fastify()) => {
         tags: ["analyze"],
       },
     },
-    analyzeController.fetch
+    analyzeController.fetch.bind(analyzeController)
   );
   fastify.post(
     "/",
@@ -35,7 +35,7 @@ const analyzeRoutes = async (fastify = Fastify()) => {
         required: ["repository"],
       },
     },
-    analyzeController.store
+    analyzeController.store.bind(analyzeController)
   );
   fastify.post(
     "/export-csv",
@@ -55,7 +55,7 @@ const analyzeRoutes = async (fastify = Fastify()) => {
         required: ["repository"],
       },
     },
-    analyzeController.getCSV
+    analyzeController.getCSV.bind(analyzeController)
   );
   fastify.post(
     "/count",
@@ -75,7 +75,7 @@ const analyzeRoutes = async (fastify = Fastify()) => {
         required: ["repository"],
       },
     },
-    analyzeController.countTestFiles
+    analyzeController.countTestFiles.bind(analyzeController)
   );
 };
 

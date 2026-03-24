@@ -4,6 +4,29 @@ import analyzeService from "../services/analyze.service.js";
 import { Parser } from "@json2csv/plainjs";
 const csvParser = new Parser({});
 class AnalyzeController {
+  setAnalyzeWarningsHeaders(reply, warnings = [], meta = {}) {
+    if (!warnings.length) {
+      return;
+    }
+
+    const truncated = warnings.some((warning) => warning.code === "FILE_LIMIT");
+    const skippedFiles = warnings.filter((warning) =>
+      ["FILE_SIZE_LIMIT", "FILE_PARSE_TIMEOUT", "FILE_PARSE_ERROR"].includes(
+        warning.code
+      )
+    ).length;
+
+    reply.header("X-Analyze-Warning-Count", String(warnings.length));
+    reply.header("X-Analyze-Truncated", String(truncated));
+    reply.header("X-Analyze-Skipped-Files", String(skippedFiles));
+    if (meta.totalTestFiles !== undefined) {
+      reply.header("X-Analyze-Total-Test-Files", String(meta.totalTestFiles));
+    }
+    if (meta.analyzedFiles !== undefined) {
+      reply.header("X-Analyze-Analyzed-Files", String(meta.analyzedFiles));
+    }
+  }
+
   async fetch(request, reply) {
     const data = detectors.map((detector) =>
       detector.name.replace("detect", "")
@@ -28,9 +51,12 @@ class AnalyzeController {
 
     try {
       const result = await analyzeService.handleAnalyze(repository);
+      this.setAnalyzeWarningsHeaders(reply, result.warnings, result.meta);
+
+      const data = result.data || [];
       const filteredResult = hasTestSmell
-        ? result.filter((re) => !!re.smells && re.smells.length > 0)
-        : result;
+        ? data.filter((re) => !!re.smells && re.smells.length > 0)
+        : data;
 
       reply.send(filteredResult);
     } catch (error) {
@@ -58,7 +84,9 @@ class AnalyzeController {
 
     try {
       const result = await analyzeService.handleAnalyzeToCSV(repository);
-      const filteredResult = result.filter(
+      this.setAnalyzeWarningsHeaders(reply, result.warnings, result.meta);
+
+      const filteredResult = result.data.filter(
         (re) => !!re.smells && re.smells.length > 0
       );
 
