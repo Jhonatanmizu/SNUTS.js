@@ -1,71 +1,209 @@
-# SNUTS.js: Sniffing Nasty Unit Test Smells in Javascript API
+# SNUTS.js: Sniffing Nasty Unit Test Smells in JavaScript
 
-This API is designed to detect test smells in JavaScript codebases. It provides endpoints to analyze JavaScript test files and identify common test smells.
+SNUTS.js is a Fastify API that analyzes public JavaScript repositories and detects test smells in Jest and Jasmine test suites.
 
-## Technologies Used
+## Learning Resources
 
-- Node.js
-- Express.js
-- JavaScript
-- Yarn
-- Babel
-- Vitest
+- Demo video: https://youtu.be/89z0jy4Nu0s
+- Paper (SBES): https://sol.sbc.org.br/index.php/sbes/article/download/30417/30223/
 
-## Setup
+## Technology Stack
 
-To run this project locally, follow these steps:
+- Node.js (runtime)
+- Fastify (HTTP API)
+- JavaScript (ES Modules)
+- Yarn (package manager)
+- Babel parser and traversal tools (AST parsing and analysis)
+- Vitest (unit testing)
+- ESLint (static code analysis)
+- PM2 (process management in production-like runs)
 
-1. Clone the repository:
+## Project Goal
 
-   ```sh
-   git clone https://github.com/Jhonatanmizu/SNUTS.js.git
-   ```
+Given a repository URL, the API clones and analyzes test files to identify test smell patterns, such as overly verbose tests, duplicated descriptions, assertions in setup hooks, and more.
 
-2. Install dependencies:
+## Architecture
 
-   ```sh
-   cd SNUTS.js
-   yarn
-   ```
+SNUTS.js follows a simple layered architecture:
 
-3. Start the API server:
+- HTTP layer: Fastify server and routes (`src/server.js`, `src/routes/analyze.route.js`)
+- Application layer: controllers orchestrate requests (`src/controllers/analyze.controller.js`)
+- Domain layer: services parse repository content and run smell detectors (`src/services`, `src/common/detectors`)
+- Output layer: JSON API responses and CSV export
 
-   ```sh
-   yarn start
-   ```
+### Request Flow
 
-4. The API will be accessible at `http://localhost:3001`.
+```mermaid
+flowchart LR
+  A[Client] --> B[Fastify Server]
+  B --> C[Analyze Routes]
+  C --> D[Analyze Controller]
+  D --> E[Analyze Service]
+  E --> F[Repository Files]
+  E --> G[AST Service]
+  G --> H[Detectors]
+  H --> I[Results Aggregation]
+  I --> J[JSON or CSV Response]
+  J --> A
+```
 
-## Endpoints
+### Detector Pipeline
 
-### `POST /`
+```mermaid
+flowchart LR
+  A[Clone or Access Repository] --> B[Find Candidate Test Files]
+  B --> C[Parse File to AST]
+  C --> D[Run Detector Set]
+  D --> E[Collect Smell Instances]
+  E --> F[Normalize and Aggregate]
+  F --> G[Return API Payload]
+```
 
-- **Description**: Detect test smells in JavaScript test files.
-- **Request Body**:
-  - `repository`: a public github repository which have jest or jasmine.
-- **Response**:
-  - `results`: Array of objects containing the detected test smells.
+### Codebase Landmarks
 
-### `GET /health`
+- `src/server.js`: API bootstrap, plugins, route registration, health endpoints
+- `src/routes/analyze.route.js`: public API endpoints and request schemas
+- `src/controllers/analyze.controller.js`: endpoint handlers
+- `src/services/analyze.service.js`: repository analysis orchestration
+- `src/services/ast.service.js`: AST parsing and AST helper utilities
+- `src/common/detectors`: detector implementations (each detector focuses on one smell)
+- `test/common/detectors`: detector unit tests
 
-- **Description**: Check the health of the API.
-- **Response**:
-  - `status`: Status of the API (e.g., "OK").
+## Getting Started
 
-## Usage
+### Prerequisites
 
-You can use the API to detect test smells in your JavaScript test files by sending a POST request to the `/detect` endpoint with the test files you want to analyze.
+- Node.js 18+
+- Yarn 1.x
 
-Example:
+### Installation
 
 ```sh
-curl -X POST http://localhost:3000/ -H "Content-Type: application/json" -d '{"repository":"repo-url"}'
+git clone https://github.com/Jhonatanmizu/snutsjs.git
+cd snutsjs
+yarn
+```
+
+### Run the API
+
+Development mode (recommended while coding):
+
+```sh
+yarn start:dev
+```
+
+Production-like mode (PM2):
+
+```sh
+yarn start
+```
+
+By default, the API runs on `http://localhost:3000`.
+You can customize host and port with environment variables:
+
+```sh
+HOST=0.0.0.0 PORT=3000 yarn start:dev
+```
+
+## API Reference
+
+Swagger UI:
+
+- `GET /documentation`
+
+Health and diagnostics:
+
+- `GET /ping` -> `{ "message": "pong" }`
+- `GET /health` -> `{ "status": "ok" }`
+
+Analysis endpoints:
+
+- `GET /`
+  - Returns available smell types and API metadata.
+- `POST /`
+  - Analyze a repository and return detected smells.
+  - Body:
+    - `repository` (string, required): Public Git repository URL.
+- `POST /count`
+  - Count test files in a repository.
+  - Body:
+    - `repository` (string, required)
+- `POST /export-csv`
+  - Analyze and return CSV output.
+  - Body:
+    - `repository` (string, required)
+
+## How To Use
+
+Run a repository smell analysis:
+
+```sh
+curl -X POST http://localhost:3000/ \
+  -H "Content-Type: application/json" \
+  -d '{"repository":"https://github.com/facebook/jest"}'
+```
+
+Count test files:
+
+```sh
+curl -X POST http://localhost:3000/count \
+  -H "Content-Type: application/json" \
+  -d '{"repository":"https://github.com/facebook/jest"}'
+```
+
+Export CSV:
+
+```sh
+curl -X POST http://localhost:3000/export-csv \
+  -H "Content-Type: application/json" \
+  -d '{"repository":"https://github.com/facebook/jest"}'
+```
+
+## Development Workflow
+
+Run tests:
+
+```sh
+yarn test
+```
+
+Watch mode:
+
+```sh
+yarn test:watch
+```
+
+Coverage:
+
+```sh
+yarn test:coverage
+```
+
+Lint:
+
+```sh
+yarn lint
 ```
 
 ## Contributing
 
-If you'd like to contribute to this project, please fork the repository and submit a pull request. You can also open an issue to report bugs or suggest new features.
+Contributions are welcome. To keep the codebase healthy, use this flow:
 
----
+1. Fork the repository and create a focused branch.
+2. Keep changes small and scoped to one concern.
+3. Add or update tests for every behavior change.
+4. Run `yarn test` and `yarn lint` locally.
+5. Open a Pull Request with:
+   - clear problem statement
+   - implementation summary
+   - test evidence (what you ran and why it is sufficient)
 
-Let me know if you need any further adjustments or additions!
+### Contribution Tips
+
+- Prefer detector changes with paired unit tests under `test/common/detectors`.
+- If you add a new detector, export it in `src/common/detectors/index.js`.
+- Keep endpoint behavior and README documentation in sync.
+
+## License
+
+MIT. See `LICENSE.md`.

@@ -22,9 +22,9 @@ server.register(swagger, {
   openapi: {
     openapi: "3.0.0",
     info: {
-      title: "SNUTS.js: Sniffing Nasty Unit Test Smells in Javascript",
+      title: "SNUTS.js: Sniffing Nasty Unit Test Smells in JavaScript",
       description:
-        "This API can detect test smells in javascript public repositories.",
+        "This API can detect test smells in JavaScript public repositories.",
       version: "0.1.0",
     },
     tags: [{ name: "analyze", description: "Analyze related end-points" }],
