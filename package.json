@@ -35,7 +35,7 @@
   "devDependencies": {
     "@eslint/js": "^9.20.0",
     "@vitest/coverage-v8": "^2.0.5",
-    "eslint": "9.x",
+    "eslint": "10.x",
     "git-commit-msg-linter": "^5.0.8",
     "globals": "^16.2.0",
     "vitest": "^2.0.5"
